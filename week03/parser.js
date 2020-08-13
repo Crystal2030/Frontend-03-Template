@@ -5,14 +5,26 @@
  * @LastEditors: liuyun03
  * @LastEditTime: 2020-08-12 23:30:45
  */
+let currentToken = null;
+function emit (token) {
+  
+  console.log(token);
+}
 const EOF = Symbol("EOF"); // EOF: End of File
 
 function data(c) {
   if (c == "<") {
     return tagOpen;
   } else if (c == EOF) {
+    emit({
+      type: 'EOF'
+    })
     return;
   } else {
+    emit({
+      type: 'text',
+      content: c
+    })
     return data;
   }
 }
@@ -20,6 +32,10 @@ function tagOpen(c) {
   if (c === "/") {
     return endTagOpen;
   } else if (c.match(/^[a-zA-Z]$/)) {
+    currentToken = {
+      type: "startTag",
+      tagName: ""
+    }
     return tagName(c);
   } else {
     return;
@@ -28,6 +44,10 @@ function tagOpen(c) {
 function endTagOpen(c) {
   if (c.match(/^[a-zA-Z]$/)) {
     // <span
+    currentToken = {
+      type: "endTag",
+      tagName: ""
+    }
     return tagName(c);
   } else if (c === ">") {
     // </>
@@ -44,8 +64,10 @@ function tagName(c) {
     // <html/
     return selfClosingStartTag;
   } else if (c.match(/^[a-zA-Z]$/)) {
+    currentToken.tagName += c //.toLowerCase()
     return tagName;
   } else if (c == ">") {
+    emit(currentToken);
     // <html> 普通的开始标签，所以需要结束掉这个标签，开始回到data状态解析下一个标签，
     return data;
   } else {
@@ -82,3 +104,5 @@ module.exports.parseHTML = function parseHTML(html) {
   // 这里使用了小技巧：因为html最后是一个文件终结的，而在文件终结位置可能有一些文本节点可能仍然是面临着一个没有结束的状态，所以需要额外给它一个字符，这个字符不能是任何一个有效的字符
   state = state(EOF);
 };
+
+console.log('111');
