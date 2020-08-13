@@ -5,11 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "chrome",
+            // "type": "chrome",
+            // "request": "launch",
+            // "name": "Launch Chrome against localhost",
+            // "url": "http://localhost:8080",
+            // "webRoot": "${workspaceFolder}"
+            "type": "node",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/week03/parser.js"
         }
     ]
 }
