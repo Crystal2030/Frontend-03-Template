@@ -3,15 +3,7 @@
 * @author: liuyun03
 * @Date: 2020-08-12 23:31:10
 * @LastEditors: liuyun03
-* @LastEditTime: 2020-08-12 23:33:59
- */
-/*
- * @Author: your name
- * @Date: 2020-08-06 23:55:23
- * @LastEditTime: 2020-08-06 23:58:30
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /Frontend-03-Template/week02/server.js
+* @LastEditTime: 2020-08-14 22:19:24
  */
 const http = require('http');
 
@@ -48,6 +40,6 @@ http.createServer((request, response) => {
             `
         );
     })
-}).listen(8008);
+}).listen(8088);
 
 console.log('server started');
