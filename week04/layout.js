@@ -328,6 +328,111 @@ function layout(element) {
       }
     });
   }
+
+  //计算交叉轴
+  var crossSpace;
+  if (!style[crossSize]) {
+    // auto sizing
+    // 如果父元素没有行高，crossSpace 永远为0，需要把元素的撑开的高度加上去
+    crossSpace = 0;
+    elementStyle[crossSize] = 0;
+    for (var i = 0; i < flexLines.length; i++) {
+      elementStyle[crossSize] =
+        elementStyle[crossSize] + flexLines[i].crossSpace;
+    }
+  } else {
+    // 如果父元素有行高，crossSpace把总的crossSize依次减掉每一行的crossSize
+    crossSpace = style[crossSize];
+    for (var i = 0; i < flexLines.length; i++) {
+      crossSpace -= flexLines[i].crossSpace;
+    }
+  }
+
+  // 根据flex的alignContent属性去分配行高
+  if (style.flexWrap === "wrap-reverse") {
+    crossBase = style[crossSize];
+  } else {
+    crossBase = 0;
+  }
+
+  var lineSize = style[crossSize] / flexLines.length;
+
+  var step;
+  if (style.alignContent === "flex-start") {
+    crossBase += 0;
+    step = 0;
+  }
+
+  if (style.alignContent === "flex-end") {
+    crossBase += crossSign * crossSpace;
+    step = 0;
+  }
+
+  if (style.alignContent === "center") {
+    crossBase += (crossSign * crossSpace) / 2;
+    step = 0;
+  }
+
+  if (style.alignContent === "space-between") {
+    crossBase += 0;
+    step = crossSpace / (flexLines.length - 1);
+  }
+
+  if (style.alignContent === "space-around") {
+    step = crossSpace / flexLines.length;
+    crossBase += (crossSign * step) / 2;
+  }
+
+  if (style.alignContent === "stretch") {
+    crossBase += 0;
+    step = 0;
+  }
+
+  flexLines.forEach(function(items) {
+    var lineCrossSize =
+      style.alignContent === "stretch"
+        ? items.crossSpace + crossSpace / flexLines.length
+        : items.crossSpace;
+
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var itemStyle = getStyle(item);
+
+      var align = itemStyle.alignSelf || style.alignItems;
+
+      if (itemStyle[crossSize] === null) {
+        itemStyle[crossSize] = align === "stretch" ? lineCrossSize : 0;
+      }
+
+      if (align === "flex-start") {
+        itemStyle[crossStart] = crossBase;
+        itemStyle[crossEnd] =
+          itemStyle[crossStart] + crossSign * itemStyle[crossSize];
+      }
+
+      if (align === "flex-end") {
+        itemStyle[crossEnd] = crossBase + crossSign * lineCrossSize;
+        itemStyle[crossStart] = crossSign * itemStyle[crossSize];
+      }
+
+      if (align === "center") {
+        itemStyle[crossStart] =
+          crossBase + (crossSign * (lineCrossSize - itemStyle[crossSize])) / 2;
+        itemStyle[crossEnd] =
+          itemStyle[crossStart] + crossSign * itemStyle[crossSize];
+      }
+
+      if (align === "stretch") {
+        itemStyle[crossStart] = crossBase;
+        itemStyle[crossEnd] =
+          crossSign * (itemStyle[crossEnd] - itemStyle[crossStart]);
+
+        itemStyle[crossSize] =
+          crossSign * (itemStyle[crossEnd] - itemStyle[crossStart]);
+      }
+    }
+    crossBase += crossSign * (lineCrossSize + step);
+  });
 }
 
 module.exports = layout;

@@ -2,17 +2,17 @@
  * @description: description
  * @author: liuyun03
  * @Date: 2020-08-12 22:50:45
-* @LastEditors: liuyun03
-* @LastEditTime: 2020-08-15 18:41:41
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-08-15 18:41:41
  */
-const css = require('css');
-const laoout = require('./layout.js');
+const css = require("css");
+const laoout = require("./layout.js");
 const EOF = Symbol("EOF"); // EOF: End of File
 let currentToken = null;
 let currentAttribute = null;
+let currentTextNode = null;
 
 let stack = [{ type: "document", children: [] }];
-let currentTextNode = null;
 
 // 加入一个新的函数，addCSSRules,把CSS规则暂存到一个数组中
 let rules = [];
@@ -23,8 +23,8 @@ function addCSSRules(text) {
 }
 
 // 这里只处理简单选择器：类选择器，id选择器和元素选择器
-// .a  
-// #a 
+// .a
+// #a
 // div
 // TODO: 实现复合选择器，实现支持空格的Class选择器
 function match(element, selector) {
@@ -35,12 +35,12 @@ function match(element, selector) {
 
   if (selector.charAt(0) == "#") {
     var attr = element.attributes.filter(attr => attr.name === "id")[0];
-    if (attr && attr.value === selector.replace("#", '')) {
+    if (attr && attr.value === selector.replace("#", "")) {
       return true;
     }
   } else if (selector.charAt(0) == ".") {
     var attr = element.attributes.filter(attr => attr.name === "class")[0];
-    if (attr && attr.value === selector.replace(".", '')) {
+    if (attr && attr.value === selector.replace(".", "")) {
       return true;
     }
   } else {
@@ -54,7 +54,7 @@ function match(element, selector) {
 
 // TODO: selectorParts 里面去解析复合选择器
 function specificity(selector) {
-  var p = [0, 0, 0, 0];// inline id class tag
+  var p = [0, 0, 0, 0]; // inline id class tag
   var selectorParts = selector.split(" ");
   for (var part of selectorParts) {
     if (part.charAt(0) == "#") {
@@ -120,7 +120,9 @@ function computeCSS(element) {
             if (!computedStyle[declaration.property].specificity) {
               computedStyle[declaration.property].value = declaration.value;
               computedStyle[declaration.property].specificity = sp;
-            } else if (compare(computedStyle[declaration.property].specificity, sp) < 0) {
+            } else if (
+              compare(computedStyle[declaration.property].specificity, sp) < 0
+            ) {
               computedStyle[declaration.property].value = declaration.value;
               computedStyle[declaration.property].specificity = sp;
             }
@@ -184,8 +186,8 @@ function emit(token) {
       currentTextNode = {
         type: "text",
         content: ""
-      }
-      top.children.push(currentTextNode)
+      };
+      top.children.push(currentTextNode);
     }
     currentTextNode.content += token.content;
   }
@@ -196,43 +198,29 @@ function data(c) {
     return tagOpen;
   } else if (c == EOF) {
     emit({
-      type: "EOF",
+      type: "EOF"
     });
     return;
   } else {
     emit({
       type: "text",
-      content: c,
+      content: c
     });
     return data;
   }
 }
+
 function tagOpen(c) {
   if (c === "/") {
     return endTagOpen;
   } else if (c.match(/^[a-zA-Z]$/)) {
     currentToken = {
       type: "startTag",
-      tagName: "",
+      tagName: ""
     };
     return tagName(c);
   } else {
     return;
-  }
-}
-function endTagOpen(c) {
-  if (c.match(/^[a-zA-Z]$/)) {
-    // <span
-    currentToken = {
-      type: "endTag",
-      tagName: "",
-    };
-    return tagName(c);
-  } else if (c === ">") {
-    // </>
-  } else if (c === EOF) {
-    // </EOF
-  } else {
   }
 }
 function tagName(c) {
@@ -257,26 +245,26 @@ function beforeAttributeName(c) {
   if (c.match(/^[\t\n\f ]$/)) {
     // 4种有效的空白符结束： tab符，换行符，禁止符和空格 <html prop
     return beforeAttributeName;
-  } else if (c == "/" || c == ">" || c == EOF) {
+  } else if (c === "/" || c === ">" || c === EOF) {
     // <html> 普通的开始标签，所以需要结束掉这个标签，开始回到data状态解析下一个标签，
     return afterAttributeName(c);
-  } else if (c == "=") {
+  } else if (c === "=") {
   } else {
     currentAttribute = {
       name: "",
-      value: "",
+      value: ""
     };
     console.log("currentAttribute", currentAttribute);
     return attributeName(c);
   }
 }
 function attributeName(c) {
-  if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
+  if (c.match(/^[\t\n\f ]$/) || c === "/" || c === ">" || c === EOF) {
     return afterAttributeName(c);
-  } else if (c == "=") {
+  } else if (c === "=") {
     return beforeAttributeValue;
-  } else if (c == "\u0000") {
-  } else if (c == '"' || c == "'" || c == "<") {
+  } else if (c === "\u0000") {
+  } else if (c === '"' || c === "'" || c === "<") {
   } else {
     currentAttribute.name += c;
     return attributeName;
@@ -285,12 +273,11 @@ function attributeName(c) {
 function beforeAttributeValue(c) {
   if (c.match(/^[\t\n\f ]$/) || c == "/" || c == ">" || c == EOF) {
     return beforeAttributeValue;
-  } else if (c == "\"") {
+  } else if (c === '"') {
     return doubleQuotedAttributeValue;
-  } else if (c == "\'") {
+  } else if (c === "'") {
     return singleQuotedAttributeValue;
-  } else if (c == ">") {
-    
+  } else if (c === ">") {
   } else {
     return UnquotedAttributeValue(c);
   }
@@ -299,8 +286,8 @@ function doubleQuotedAttributeValue(c) {
   if (c == '"') {
     currentToken[currentAttribute.name] = currentAttribute.value;
     return afterQuotedAttributeValue;
-  } else if (c == "\u0000") {
-  } else if (c == EOF) {
+  } else if (c === "\u0000") {
+  } else if (c === EOF) {
   } else {
     currentAttribute.value += c;
     return doubleQuotedAttributeValue;
@@ -311,26 +298,28 @@ function singleQuotedAttributeValue(c) {
   if (c == "'") {
     currentToken[currentAttribute.name] = currentAttribute.value;
     return afterQuotedAttributeValue;
-  } else if (c == "\u0000") {
-  } else if (c == EOF) {
+  } else if (c === "\u0000") {
+  } else if (c === EOF) {
   } else {
     currentAttribute.value += c;
-    return doubleQuotedAttributeValue;
+    return singleQuotedAttributeValue;
   }
 }
 function afterQuotedAttributeValue(c) {
   if (c.match(/^[\t\n\f ]$/)) {
     return beforeAttributeName;
-  } else if (c == "/") {
+  } else if (c === "/") {
     return selfClosingStartTag;
-  } else if (c == ">") {
+  } else if (c === ">") {
     currentToken[currentAttribute.name] = currentAttribute.value;
     emit(currentToken);
     return data;
-  } else if (c == EOF) {
+  } else if (c === EOF) {
   } else {
-    currentAttribute.value += c;
-    return doubleQuotedAttributeValue;
+    // 可以抛错 这里对应<div class="a"b>这种情况
+    throw new Error("afterQuotedAttributeValue error");
+    // currentAttribute.value += c;
+    // return afterQuotedAttributeValue;
   }
 }
 function UnquotedAttributeValue(c) {
@@ -338,6 +327,7 @@ function UnquotedAttributeValue(c) {
     currentToken[currentAttribute.name] = currentAttribute.value;
     return beforeAttributeName;
   } else if (c == "/") {
+    // 这里可以处理 <img id=b/>这种情况
     currentToken[currentAttribute.name] = currentAttribute.value;
     return selfClosingStartTag;
   } else if (c == ">") {
@@ -345,7 +335,7 @@ function UnquotedAttributeValue(c) {
     emit(currentToken);
     return data;
   } else if (c == "\u0000") {
-  } else if (c == '"' || c == "'" || c == "<" || c == "=" || c == "`") {
+  } else if (c === '"' || c === "'" || c === "<" || c === "=" || c === "`") {
   } else if (c == EOF) {
   } else {
     currentAttribute.value += c;
@@ -353,11 +343,51 @@ function UnquotedAttributeValue(c) {
   }
 }
 function selfClosingStartTag(c) {
-  if (c == "c") {
+  if (c == ">") {
     currentToken.isSelfClosing = true;
+    emit(currentToken);
     return data;
-  } else if (c === "EOF") {
+  } else if (c === EOF) {
   } else {
+  }
+}
+
+function endTagOpen(c) {
+  if (c.match(/^[a-zA-Z]$/)) {
+    // <span
+    currentToken = {
+      type: "endTag",
+      tagName: ""
+    };
+    return tagName(c);
+  } else if (c === ">") {
+    // </>
+  } else if (c === EOF) {
+    // </EOF
+  } else {
+  }
+}
+
+function afterAttributeName(c) {
+  if (c.match(/^[\t\n\f ]$/)) {
+    return afterAttributeName;
+  } else if (c === "/") {
+    return selfClosingStartTag;
+  } else if (c === "=") {
+    return beforeAttributeValue;
+  } else if (c === ">") {
+    currentToken[currentAttribute.name] = currentAttribute.value;
+    emit(currentToken);
+    return data;
+  } else if (c === EOF) {
+  } else {
+    // 理论上这条分支是多余的，从beforeAttributeName或者attributeName状态进入时c已经确定了
+    // currentToken[currentAttribute.name] = currentAttribute.value
+    currentAttribute = {
+      name: "",
+      value: ""
+    };
+    return attributeName(c);
   }
 }
 module.exports.parseHTML = function parseHTML(html) {
@@ -368,6 +398,6 @@ module.exports.parseHTML = function parseHTML(html) {
   }
   // 这里使用了小技巧：因为html最后是一个文件终结的，而在文件终结位置可能有一些文本节点可能仍然是面临着一个没有结束的状态，所以需要额外给它一个字符，这个字符不能是任何一个有效的字符
   state = state(EOF);
-  console.log(stack[0])
-  return stack[0]
+  console.log(stack[0]);
+  return stack[0];
 };
