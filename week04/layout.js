@@ -48,8 +48,9 @@ function layout(element) {
   items.sort((a, b) => {
     return (a.style.order || 0) - (b.style.order || 0);
   });
+
   // 取出style属性，处理主轴和交叉轴
-  var style = elementStyle;
+  let style = elementStyle;
 
   ["width", "height"].forEach(size => {
     if (style[size] === "auto" || style[size] === "") {
@@ -85,7 +86,7 @@ function layout(element) {
     crossBase; // 交叉轴开始位置值 0 style.width style.height
 
   if (style.flexDirection === "row") {
-    mainSize = "width"; // 主轴尺寸，要么是宽 要么是高
+    mainSize = "width";
     mainStart = "left";
     mainEnd = "right";
     mainSign = +1;
@@ -95,7 +96,6 @@ function layout(element) {
     crossStart = "top";
     crossEnd = "bottom";
   }
-
   if (style.flexDirection === "row-reverse") {
     mainSize = "width";
     mainStart = "right";
@@ -107,7 +107,6 @@ function layout(element) {
     crossStart = "top";
     crossEnd = "bottom";
   }
-
   if (style.flexDirection === "column") {
     mainSize = "height";
     mainStart = "top";
@@ -119,7 +118,6 @@ function layout(element) {
     crossStart = "left";
     crossEnd = "right";
   }
-
   if (style.flexDirection === "column-reverse") {
     mainSize = "height";
     mainStart = "bottom";
@@ -132,14 +130,10 @@ function layout(element) {
     crossEnd = "right";
   }
 
-  /** 反向换行：
-   * 需要交换交叉轴的开始和结束
-   * crossSize 改为 -1
-   */
   if (style.flexWrap === "wrap-reverse") {
-    var tmp = crossStart;
+    let temp = crossStart;
     crossStart = crossEnd;
-    crossEnd = tmp;
+    crossEnd = temp;
     crossSign = -1;
   } else {
     crossBase = 0;
@@ -147,7 +141,7 @@ function layout(element) {
   }
 
   // 如果父元素没有设置主轴尺寸，比如主轴是width属性，那么父元素是没有width的，那么就会进入一个AutoMainSize模式(父元素没有设置主轴尺寸，所以由主轴撑开，这种情况下，它的尺寸无论如何也不会超)
-  var isAutoMainSize = false;
+  let isAutoMainSize = false;
   // 父元素没有设置主轴尺寸的时候，由子元素的mainSize相加
   if (!style[mainSize]) {
     style[mainSize] = 0;
@@ -188,19 +182,19 @@ function layout(element) {
       }
       flexLine.push(item);
     } else {
-      // 换行逻辑
-      // 如果元素比父元素尺寸大，需要把把父元素尺寸赋值给当前元素的尺寸if (itemStyle[mainSize] > style[mainSize]) {
+      // style.flexWrap === 'wrap'
+      if (itemStyle[mainSize] > style[mainSize]) {
         itemStyle[mainSize] = style[mainSize];
       }
       if (mainSpace < itemStyle[mainSize]) {
         // mainSpace、crossSpace保存在旧的一行里
-        // 主轴
+        // 换行逻辑
+        // 如果元素比父元素尺寸大，需要把把父元素尺寸赋值给当前元素的尺寸if (itemStyle[mainSize] > style[mainSize]) {
         flexLine.mainSpace = mainSpace;
-        // 交叉轴
         flexLine.crossSpace = crossSpace;
         flexLine = [item];
         flexLines.push(flexLine);
-        // 重制mainSpace和crossSpace
+        // 重置mainSpace和crossSpace
         mainSpace = style[mainSize];
         crossSpace = 0;
       } else {
@@ -214,6 +208,7 @@ function layout(element) {
     }
   }
   flexLine.mainSpace = mainSpace;
+
   console.log("items:", items);
 
   if (style.flexWrap === "nowrap" || isAutoMainSize) {
@@ -315,6 +310,7 @@ function layout(element) {
   }
 
   // let crossSpace
+
   //计算交叉轴
   if (!style[crossSize]) {
     crossSpace = 0;
