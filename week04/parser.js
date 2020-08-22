@@ -6,7 +6,7 @@
  * @LastEditTime: 2020-08-15 18:41:41
  */
 const css = require("css");
-const laoout = require("./layout.js");
+const layout = require("./layout.js");
 const EOF = Symbol("EOF"); // EOF: End of File
 let currentToken = null;
 let currentAttribute = null;
@@ -18,7 +18,7 @@ let stack = [{ type: "document", children: [] }];
 let rules = [];
 function addCSSRules(text) {
   var ast = css.parse(text);
-  console.log(JSON.stringify(ast, null, "    "));
+  // console.log(JSON.stringify(ast, null, "    "));
   rules.push(...ast.stylesheet.rules);
 }
 
@@ -54,12 +54,13 @@ function match(element, selector) {
 
 // TODO: selectorParts 里面去解析复合选择器
 function specificity(selector) {
-  var p = [0, 0, 0, 0]; // inline id class tag
-  var selectorParts = selector.split(" ");
-  for (var part of selectorParts) {
-    if (part.charAt(0) == "#") {
+  // 第0位对应行内样式，第1位对应ID选择器，第2位对应类选择器，第三位对应标签选择器
+  let p = [0, 0, 0, 0];
+  let selectorParts = selector.split(" ");
+  for (let part of selectorParts) {
+    if (part.charAt(0) === "#") {
       p[1] += 1;
-    } else if (part.charAt() == ".") {
+    } else if (part.charAt(0) === ".") {
       p[2] += 1;
     } else {
       p[3] += 1;
@@ -79,8 +80,8 @@ function compare(sp1, sp2) {
 }
 
 function computeCSS(element) {
-  console.log(rules);
-  console.log("compute CSS for Element", element);
+  // console.log(rules);
+  // console.log("compute CSS for Element", element);
   var elements = stack.slice().reverse(); // 获取父元素序列
   if (!element.computedStyle) {
     element.computedStyle = {};
@@ -143,11 +144,9 @@ function emit(token) {
       children: [],
       attributes: []
     };
-
     element.tagName = token.tagName;
-
     for (let p in token) {
-      if (p != "type" && p != "tagName") {
+      if (p !== "type" && p !== "tagName") {
         element.attributes.push({
           name: p,
           value: token[p]
@@ -158,31 +157,27 @@ function emit(token) {
     computeCSS(element);
 
     top.children.push(element);
-    element.parent = top;
+    // element.parent = top
 
     if (!token.isSelfClosing) {
       stack.push(element);
     }
     // 其他标签（开始标签、结束标签、自封闭标签），当前的文本节点需要清掉
     currentTextNode = null;
-  } else if (token.type == "endTag") {
-    if (top.tagName != token.tagName) {
-      throw new Error("Tag start end doesn't match!");
+  } else if (token.type === "endTag") {
+    if (top.tagName !== token.tagName) {
+      throw new Error(`Tag start end doesn't match!`);
     } else {
-      // +++++++++遇到style标签时，执行添加CSS规则的操作++++++++
+      // 遇到style标签时，执行添加CSS规则的操作
       if (top.tagName === "style") {
         addCSSRules(top.children[0].content);
       }
-      /** layout添加时机解释：
-       * 因为flex布局是需要知道子元素的，我们认为它的自元素一定是发生在标签的结束标签之前
-       */
       layout(top);
       stack.pop();
     }
     currentTextNode = null;
-  } else if (top.type == "text") {
-    // 如果是相邻的文本节点会被合并
-    if (currentTextNode == null) {
+  } else if (token.type === "text") {
+    if (currentTextNode === null) {
       currentTextNode = {
         type: "text",
         content: ""
@@ -254,7 +249,7 @@ function beforeAttributeName(c) {
       name: "",
       value: ""
     };
-    console.log("currentAttribute", currentAttribute);
+    // console.log("currentAttribute", currentAttribute);
     return attributeName(c);
   }
 }

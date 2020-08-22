@@ -229,8 +229,7 @@ void (async function() {
     }
   });
   let response = await request.send();
-  console.log("response", response);
   let dom = parser.parseHTML(response.body);
-  comsole.log(JSON.stringify(dom, null, "    "));
+  console.log(JSON.stringify(dom, null, "    "));
   console.log("");
 })();
