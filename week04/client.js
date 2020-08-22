@@ -1,5 +1,7 @@
 const net = require("net");
+const images = require("images");
 const parser = require("./parser.js");
+const render = require("./render.js");
 /**
  * 第一步HTTP请求
  * 设计一个HTTP请求的类
@@ -70,8 +72,8 @@ class Request {
 
   toString() {
     return `${this.method} ${this.path} HTTP/1.1\r\n${Object.keys(this.headers)
-      .map((key) => `${key}: ${this.headers[key]}`)
-      .join('\r\n')}\r\n\r\n${this.bodyText}`
+      .map(key => `${key}: ${this.headers[key]}`)
+      .join("\r\n")}\r\n\r\n${this.bodyText}`;
   }
 }
 
@@ -230,6 +232,12 @@ void (async function() {
   });
   let response = await request.send();
   let dom = parser.parseHTML(response.body);
+  let viewport = images(800, 600);
+  // 绘制一个元素
+  // render(viewport, dom.children[0].children[3].children[1].children[3]);
+  // 绘制dom树
+  render(viewport, dom);
+  viewport.save("vieport.jpg");
   console.log(JSON.stringify(dom, null, "    "));
   console.log("");
 })();
