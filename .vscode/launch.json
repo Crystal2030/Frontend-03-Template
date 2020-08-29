@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/week04/client.js",
+            "program": "${workspaceFolder}/week05/index.html",
             "runtimeExecutable": "/Users/liuyun/.nvm/versions/node/v11.15.0/bin/node"
         }
     ]
