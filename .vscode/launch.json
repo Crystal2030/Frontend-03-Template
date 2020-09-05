@@ -8,8 +8,8 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceFolder}/week05/index.html",
-            "runtimeExecutable": "/Users/liuyun/.nvm/versions/node/v11.15.0/bin/node"
+            "program": "${workspaceFolder}/week06/test.js",
+            "runtimeExecutable": "/Users/liuyun/.nvm/versions/node/v11.10.1/bin/node"
         }
     ]
 }
