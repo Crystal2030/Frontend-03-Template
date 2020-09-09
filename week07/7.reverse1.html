@@ -1,0 +1,37 @@
+<!--
+ * @description: 把一个元素所有的子元素逆序，eg：1 2 3 4 5 =》 5 4 3 2 1 
+ * @author: liuyun03
+ * @Date: 2020-09-08 20:23:55
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-09-09 08:49:49
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reverse living collection</title>
+</head>
+<body>
+    <div id="a">
+        <span>1</span>
+        <p>2</p>
+        <a href="#">3</a>
+        <div>4</div>
+    </div>
+    <script>
+        let element = document.getElementById('a');
+
+        function reverseChildren(element) {
+            var l = element.childNodes.length; // 此时childNodes是一个living collection
+            // 从后往前循环，把最后一个元素挪掉，是不会影响前面的元素，这样就可以直接在living collection上操作了
+            while(l-- > 0) {
+                console.log(l, element.childNodes[l])
+                element.appendChild(element.childNodes[l]);
+            }
+        }
+
+        reverseChildren(element);
+    </script>
+</body>
+</html>

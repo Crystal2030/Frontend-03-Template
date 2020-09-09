@@ -1,0 +1,28 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-09-08 21:12:20
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-09-08 21:26:49
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>range</title>
+</head>
+<body>
+    <div id="a">123 <span style="background-color: pink;">456789</span>0123456789</div>
+
+    <script>
+        let range = new Range();
+        // 从第一个节点的第3个位置到第2个节点的第3个位置中间的都被删了，且dom树只剩下文本节点
+        // range.setStart(document.getElementById('a').childNodes[0], 3);
+        // range.setEnd(document.getElementById('a').childNodes[2], 3);
+        // 可以去选中789</span>012 这一部分的内容截掉，后面半个标签会被自动补上一个结束标签
+        range.setStart(document.getElementById('a').childNodes[1].childNodes[0], 3);
+        range.setEnd(document.getElementById('a').childNodes[2], 3);
+    </script>
+</body>
+</html>
