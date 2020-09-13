@@ -1,0 +1,44 @@
+<!--
+ * @description: 把一个元素所有的子元素逆序，eg：1 2 3 4 5 =》 5 4 3 2 1 
+ * @author: liuyun03
+ * @Date: 2020-09-08 20:23:55
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-09-08 20:29:26
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reverse</title>
+</head>
+<body>
+    <div id="a">
+        <span>1</span>
+        <p>2</p>
+        <a href="#">3</a>
+        <div>4</div>
+    </div>
+    <script>
+        let element = document.getElementById('a');
+
+        function reverseChildren(element) {
+            let children = Array.prototype.slice.call(element.childNodes);  // 把childrenNodes变成一个普通的数组
+
+            for(let child of children) {
+                element.removeChild(child);
+            }
+            // 用这个可以替代remove操作
+            // element.innerHTML = "";
+
+            children.reverse();
+
+            for(let child of children) {
+                element.appendChild(child);
+            }
+        }
+
+        reverseChildren(element);
+    </script>
+</body>
+</html>

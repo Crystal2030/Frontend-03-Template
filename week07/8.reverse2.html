@@ -1,0 +1,47 @@
+<!--
+ * @description: 把一个元素所有的子元素逆序，eg：1 2 3 4 5 =》 5 4 3 2 1 
+ * @author: liuyun03
+ * @Date: 2020-09-08 20:23:55
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-09-09 09:20:29
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reverse range API</title>
+</head>
+<body>
+    <div id="a">
+        <span>1</span>
+        <p>2</p>
+        <a href="#">3</a>
+        <div>4</div>
+    </div>
+    <script>
+        let element = document.getElementById('a');
+
+        /** 这种方法整个过程进行了两次重排，高性能操作dom树 */
+        function reverseChildren(element) {
+            let range = new Range();
+            /** 第一步选中a元素里面的所有子元素 */
+            range.selectNodeContents(element);
+
+            /**
+             * fragment是不需要发生重排的操纵，性能比较高
+             * 第二步，执行extract，div里面就清空了 
+             */
+            let fragment =  range.extractContents(); 
+            var l = fragment.childNodes.length;
+            while(l-- > 0) {
+                fragment.appendChild(fragment.childNodes[l]);
+            }
+            /** 最后进行插入操作 */
+            element.appendChild(fragment);
+        }
+
+        reverseChildren(element);
+    </script>
+</body>
+</html>
