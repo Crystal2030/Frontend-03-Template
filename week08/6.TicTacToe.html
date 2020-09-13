@@ -1,0 +1,191 @@
+<!--
+ * @Author: liuyun
+ * @Date: 2020-09-13 11:20:43
+ * @LastEditTime: 2020-09-13 22:30:48
+ * @LastEditors: Please set LastEditors
+ * @Description: TicTacToe游戏 第6步： 
+ 策略：
+ 第一层策略：我要赢
+ 第二层策略：别输
+ 第三层策略：......
+ 棋谱
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TicTacToe</title>
+    <style>
+      .cell {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+        display: inline-block;
+        border: 1px solid white;
+        vertical-align: middle;
+        line-height: 100px;
+        font-size: 50px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="board"></div>
+    <script>
+      let pattern = [
+        [0, 2, 0],
+        [0, 1, 0],
+        [0, 0, 0],
+      ];
+      let color = 1;
+
+      console.log(pattern);
+
+      function show() {
+        let board = document.getElementById("board");
+        // 绘制之前需要清空棋盘，然后重新绘制
+        board.innerHTML = "";
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.innerText =
+              pattern[i][j] === 2 ? "❌" : pattern[i][j] === 1 ? "⭕️" : "";
+            cell.addEventListener("click", () => move(j, i));
+            board.appendChild(cell);
+          }
+          board.appendChild(document.createElement("br"));
+        }
+      }
+
+      function move(x, y) {
+        pattern[y][x] = color;
+        if (check(pattern, color)) {
+          alert(color === 2 ? "❌ is winner" : "⭕️ is winner");
+        }
+        // 让color从1变2，从2变1交替变化
+        color = 3 - color;
+        show();
+        // 检查是不是要赢了
+        if (willWin(pattern, color)) {
+          console.log(color === 2 ? "❌ will winner" : "⭕️ will winner");
+        }
+      }
+
+      function check(pattern, color) {
+        // 判断同一行
+        for (let i = 0; i < 3; i++) {
+          let win = true;
+          for (let j = 0; j < 3; j++) {
+            if (pattern[i][j] !== color) {
+              win = false;
+            }
+          }
+          if (win) {
+            return true;
+          }
+        }
+        // 判断同一列
+        for (let i = 0; i < 3; i++) {
+          let win = true;
+          for (let j = 0; j < 3; j++) {
+            if (pattern[j][i] !== color) {
+              win = false;
+            }
+          }
+          if (win) {
+            return true;
+          }
+        }
+        // 判断斜线，横纵坐标都相等
+        {
+          let win = true;
+          for (let j = 0; j < 3; j++) {
+            if (pattern[j][j] !== color) {
+              win = false;
+            }
+          }
+          if (win) {
+            return true;
+          }
+        }
+        {
+          let win = true;
+          for (let j = 0; j < 3; j++) {
+            if (pattern[j][2 - j] !== color) {
+              win = false;
+            }
+          }
+          if (win) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      function clone(pattern) {
+        return JSON.parse(JSON.stringify(pattern));
+      }
+
+      // 循环遍历上面每一个空节点，如果有一个空节点能让check变赢，那么久可用在willWin上去打上win了，但是如果willWin直接走这一步，然后执行check，原来的pattern就已经被破坏掉了，所以要写一个克隆函数
+      function willWin(pattern, color) {
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            //如果当前位置不是空的，直接跳过去
+            if (pattern[i][j]) {
+              continue;
+            }
+            let tmp = clone(pattern);
+            tmp[i][j] = color;
+            if (check(tmp, color)) {
+              return [j, i];
+            }
+          }
+        }
+        return null;
+      }
+
+      function bestChoice(pattern, color) {
+        let p;
+        if ((p = willWin(pattern, color))) {
+          return {
+            point: p,
+            result: 1,
+          };
+        }
+
+        // 默认值为-2：因为-2弱于任何一个这样的局面，即使输也不会比-2更差了
+        let result = -2;
+        let point = null;
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            //如果当前位置不是空的，直接跳过去
+            if (pattern[i][j]) {
+              continue;
+            }
+            let tmp = clone(pattern);
+            tmp[i][j] = color;
+            let r = bestChoice(tmp, 3 - color).result;
+            // 找到对方最差的点
+            if (-r > result) {
+              result = -r;
+              point = [j, i];
+            }
+            // win-lost剪枝(胜负剪枝)：如果已经找到一个点可以赢了，就停止
+            if (result === 1) {
+
+            }  
+          }
+          return {
+            point: point,
+            result: point ? result : 0,
+          };
+        }
+      }
+
+      show(pattern);
+      console.log(bestChoice(pattern, color));
+    </script>
+  </body>
+</html>
