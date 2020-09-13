@@ -1,0 +1,58 @@
+<!--
+ * @Author: liuyun
+ * @Date: 2020-09-13 11:20:43
+ * @LastEditTime: 2020-09-13 11:32:36
+ * @LastEditors: Please set LastEditors
+ * @Description: TicTacToe游戏 第二步：绘制棋盘
+ * @FilePath: /Frontend-03-Template/week08/2.TicTacToe.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TicTacToe</title>
+    <style>
+      .cell {
+        width: 100px;
+        height: 100px;
+        background-color: green;
+        display: inline-block;
+        border: 1px solid white;
+        vertical-align: middle;
+        line-height: 100px;
+        font-size: 50px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="board"></div>
+    <script>
+      let pattern = [
+        [2, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0],
+      ];
+
+      let color = 1;
+
+      console.log(pattern);
+
+      function show() {
+        let board = document.getElementById("board");
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.innerText =
+              pattern[i][j] === 2 ? "❌" : pattern[i][j] === 1 ? "⭕️" : "";
+            board.appendChild(cell);
+          }
+          board.appendChild(document.createElement("br"));
+        }
+      }
+      show(pattern);
+    </script>
+  </body>
+</html>
