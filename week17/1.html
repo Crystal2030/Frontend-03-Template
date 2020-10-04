@@ -1,0 +1,44 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-10-03 22:53:04
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-10-04 16:58:06
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let regexp = /((?:0|[1-9][0-9]*)\.[0-9]*|(?:0|[1-9][0-9]*))|([ ]+)|([\r\n]+)|(\+)|(\-)|(\*)|(\/)/g;
+      const dictionary = [
+        "Number",
+        "Whitespace",
+        "LineTerminator",
+        "+",
+        "-",
+        "*",
+        "/",
+      ];
+      function tokenize(source) {
+        var result = null;
+        var lastIndex = 0;
+        while (true) {
+          result = regexp.exec(source);
+          if (!result) break;
+          for (var i = 1; i <= dictionary.length; i++) {
+            if (result[i]) {
+              console.log(dictionary[i - 1]);
+            }
+          }
+          console.log(result);
+        }
+      }
+      tokenize("1024 + 10 * 25");
+    </script>
+  </body>
+</html>
