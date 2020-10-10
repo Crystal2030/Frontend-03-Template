@@ -1,0 +1,68 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-10-10 11:14:39
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-10-10 15:15:11
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let endOfWord = Symbol("$"); // 利用Symbol的不可重复的特点防止字符串中本身存在的$
+      class Trie {
+        constructor() {
+          // Object.create(null)创建字符串，避免收到Object.prototype上面的污染
+          this.root = Object.create(null);
+        }
+        insert(word) {
+          let node = this.root;
+          for (let char of word) {
+            if (!node[char]) {
+              // 如果子树不存在，就先创建子树
+              node[char] = Object.create(null);
+            }
+            node = node[char];
+          }
+          node[endOfWord] = node[endOfWord] + 1 || 1;
+        }
+
+        /** 找出出现最多的随机字符串 */
+        most() {
+          let max = 0;
+          let maxWord = null;
+          let visit = (node, word) => {
+            if (node[endOfWord] && node[endOfWord] > max) {
+              max = node[endOfWord];
+              maxWord = word;
+            }
+            for (let p in node) {
+              visit(node[p], word + p);
+            }
+          };
+          visit(this.root, "");
+          console.log(maxWord, max);
+
+          return { maxWord, max };
+        }
+      }
+      function randomWord(length) {
+        var s = "";
+        for (let i = 0; i < length; i++) {
+          // String.fromCharCode() 方法返回由指定的 UTF-16 代码单元序列创建的字符串
+          s += String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0));
+        }
+        return s;
+      }
+      let trie = new Trie();
+      for (let i = 0; i < 100000; i++) {
+        trie.insert(randomWord(4));
+      }
+    </script>
+  </body>
+</html>
