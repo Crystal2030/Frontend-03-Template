@@ -1,0 +1,111 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-09-27 18:25:41
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-09-27 19:24:00
+-->
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>寻路</title>
+    <style>
+      .cell {
+        display: inline-block;
+        line-height: 7px;
+        width: 6px;
+        height: 6px;
+        background-color: gray;
+        border-bottom: solid 1px white;
+        border-right: solid 1px white;
+        vertical-align: top;
+      }
+      #container {
+        width: 701px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <button onclick="localStorage['map'] = JSON.stringify(map)">Save</button>
+    <script>
+      let map = localStorage["map"]
+        ? JSON.parse(localStorage["map"])
+        : Array(10000).fill(0);
+
+      let container = document.getElementById("container");
+      for (let y = 0; y < 100; y++) {
+        for (let x = 0; x < 100; x++) {
+          let cell = document.createElement("div");
+          cell.classList.add("cell");
+
+          // 有墙用1表示 没墙用0表示
+          if (map[100 * y + x] === 1) {
+            cell.style.backgroundColor = "black";
+          }
+          cell.addEventListener("mousemove", () => {
+            if (mousedown) {
+              if (clear) {
+                cell.style.backgroundColor = "";
+                /** 100*y+x 表示一维数组表示一个二维矩阵 */
+                map[100 * y + x] = 0;
+              } else {
+                cell.style.backgroundColor = "black";
+                map[100 * y + x] = 1;
+              }
+            }
+          });
+          container.appendChild(cell);
+        }
+      }
+      let mousedown = false;
+      let clear = false;
+      document.addEventListener("mousedown", (e) => {
+        mousedown = true;
+        clear = e.which === 3;
+      });
+      document.addEventListener("mouseup", () => (mousedown = false));
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+
+      function sleep(t) {
+        return new Promise(function (resolve) {
+          setTimeout(resolve, t);
+        });
+      }
+
+      async function findPath(map, start, end) {
+        var queue = [start];
+        async function insert(x, y) {
+          // 遇到边缘就无法insert
+          if (x < 0 || x >= 100 || y < 0 || y >= 100) {
+            return;
+          }
+          // 如果有障碍物
+          if (map[y * 100 + x]) {
+            return;
+          }
+          await sleep(30);
+          container.children[y * 100 + x].style.backgroundColor = "lightgreen";
+          // 新的节点标为2
+          map[y * 100 + x] = 2;
+          queue.push([x, y]);
+        }
+
+        while (queue.length) {
+          let [x, y] = queue.shift();
+          // console.log(x, y);
+          if (x === end[0] && y === end[1]) {
+            return true;
+          }
+          await insert(x - 1, y); // 左
+          await insert(x, y - 1); // 右
+          await insert(x + 1, y); // 上
+          await insert(x, y + 1); // 下
+        }
+        return false;
+      }
+      console.log(findPath(map, [0, 0], [99, 99]));
+    </script>
+  </body>
+</html>

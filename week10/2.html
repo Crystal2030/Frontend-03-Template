@@ -1,0 +1,63 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-10-03 22:53:04
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-10-04 17:11:42
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let regexp = /((?:0|[1-9][0-9]*)\.[0-9]*|(?:0|[1-9][0-9]*))|([ ]+)|([\r\n]+)|(\+)|(\-)|(\*)|(\/)/g;
+      const dictionary = [
+        "Number",
+        "Whitespace",
+        "LineTerminator",
+        "+",
+        "-",
+        "*",
+        "/",
+      ];
+      function* tokenize(source) {
+        var result = null;
+        var lastIndex = 0;
+        while (true) {
+          lastIndex = regexp.lastIndex;
+          result = regexp.exec(source);
+          if (!result) break;
+          for (var i = 1; i <= dictionary.length; i++) {
+            if (result[i]) {
+              console.log(dictionary[i - 1]);
+            }
+            if (regexp.lastIndex - lastIndex > result[0].length) {
+              break;
+            }
+            let token = {
+              type: null,
+              value: null,
+            };
+            for (var i = 1; i <= dictionary.length; i++) {
+              if (result[i]) {
+                token.type = dictionary[i - 1];
+              }
+            }
+            token.value = result[0];
+            yield token;
+          }
+          yield {
+            type: "EOF",
+          };
+        }
+      }
+      for (let token of tokenize("1024 + 10 * 25")) {
+        console.log(token);
+      }
+    </script>
+  </body>
+</html>
