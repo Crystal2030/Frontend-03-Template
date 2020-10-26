@@ -1,0 +1,70 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-10-20 09:29:32
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-10-21 09:23:23
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let callbacks = new Map();
+      let usedRectiveties = [];
+      let object = {
+        a: 1,
+        b: 2,
+      };
+      let po = reactive(object);
+
+      effect(() => {
+        console.log("call effect-->", po.a);
+      });
+
+      function effect(callback) {
+        // callbacks.push(callback);
+        usedRectiveties = [];
+        callback();
+        console.log("effect definition-->", usedRectiveties);
+
+        for (let reactivity of usedRectiveties) {
+          if (!callbacks.has(reactivity[0])) {
+            callbacks.set(reactivity[0], new Map());
+          }
+          if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+            callbacks.get(reactivity[0]).set(reactivity[1], []);
+          }
+          callbacks.get(reactivity[0]).get(reactivity[1]).push(callback);
+        }
+      }
+
+      function reactive(object) {
+        return new Proxy(object, {
+          set(obj, prop, val) {
+            obj[prop] = val;
+            console.log(obj, prop, val);
+            if (callbacks.get(obj)) {
+              if (callbacks.get(obj).get(prop)) {
+                for (let callback of callbacks.get(obj).get(prop)) {
+                  callback();
+                }
+              }
+            }
+
+            return obj[prop];
+          },
+          get(obj, prop) {
+            console.log("reactive get-->", obj, prop);
+            usedRectiveties.push([obj, prop]);
+            return obj[prop];
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

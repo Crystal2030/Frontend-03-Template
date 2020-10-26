@@ -1,0 +1,111 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-10-20 09:29:32
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-10-23 08:56:24
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="range" min="0" max="255" id="r" />
+    <input type="range" min="0" max="255" id="g" />
+    <input type="range" min="0" max="255" id="b" />
+    <div id="color" style="width: 100px; height: 100px"></div>
+    <script>
+      let callbacks = new Map();
+      let usedRectiveties = [];
+      //
+      let reactiveties = new Map();
+      let object = {
+        r: 1,
+        g: 1,
+        b: 1,
+      };
+      let po = reactive(object);
+
+      effect(() => {
+        // 从数据到input单相绑定 effect自动让po.r变的时候input值跟着变
+        document.getElementById("r").value = po.r;
+      });
+      effect(() => {
+        // 从数据到input单相绑定 effect自动让po.r变的时候input值跟着变
+        document.getElementById("g").value = po.g;
+      });
+      effect(() => {
+        // 从数据到input单相绑定 effect自动让po.r变的时候input值跟着变
+        document.getElementById("b").value = po.b;
+      });
+      effect(() => {
+        // 从数据到input单相绑定 effect自动让po.r变的时候input值跟着变
+        document.getElementById(
+          "color"
+        ).style.backgroundColor = `rgb(${po.r}, ${po.g}, ${po.b})`;
+      });
+
+      // dom发生变化，po跟着变化
+      document
+        .getElementById("r")
+        .addEventListener("input", (event) => (po.r = event.target.value));
+      document
+        .getElementById("g")
+        .addEventListener("input", (event) => (po.g = event.target.value));
+      document
+        .getElementById("b")
+        .addEventListener("input", (event) => (po.b = event.target.value));
+
+      function effect(callback) {
+        // callbacks.push(callback);
+        usedRectiveties = [];
+        callback();
+        console.log("effect definition-->", usedRectiveties);
+
+        for (let reactivity of usedRectiveties) {
+          if (!callbacks.has(reactivity[0])) {
+            callbacks.set(reactivity[0], new Map());
+          }
+          if (!callbacks.get(reactivity[0]).has(reactivity[1])) {
+            callbacks.get(reactivity[0]).set(reactivity[1], []);
+          }
+          callbacks.get(reactivity[0]).get(reactivity[1]).push(callback);
+        }
+      }
+
+      function reactive(object) {
+        if (reactiveties.has(object)) {
+          return reactiveties.get(object);
+        }
+        let proxy = new Proxy(object, {
+          set(obj, prop, val) {
+            obj[prop] = val;
+            console.log(obj, prop, val);
+            if (callbacks.get(obj)) {
+              if (callbacks.get(obj).get(prop)) {
+                for (let callback of callbacks.get(obj).get(prop)) {
+                  callback();
+                }
+              }
+            }
+
+            return obj[prop];
+          },
+          get(obj, prop) {
+            usedRectiveties.push([obj, prop]);
+            if (typeof obj[prop] === "object") {
+              return reactive(obj[prop]); // 生成了一个新的proxy，最后po.a.b访问的proxy跟use effect调用那一遍访问的proxy不一致，所以需要用一个全局的表格保存reactivities
+            }
+            return obj[prop];
+          },
+        });
+
+        reactiveties.set(object, proxy);
+        return proxy;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let object = {
+        a: 1,
+        b: 2,
+      };
+      let po = new Proxy(object, {
+        set(obj, prop, val) {
+          console.log(obj, prop);
+        },
+      });
+
+      // 这个就是调用 get
+      po.a;
+
+      // 使用 set，是一个默认行为
+      po.a = 11;
+    </script>
+  </body>
+</html>
