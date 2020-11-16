@@ -3,16 +3,24 @@
  * @author: liuyun03
  * @Date: 2020-11-10 09:18:09
  * @LastEditors: liuyun03
- * @LastEditTime: 2020-11-11 09:49:05
+ * @LastEditTime: 2020-11-16 09:35:13
 -->
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <script src="./gesture.js"></script>
+    <!-- <script src="./gesture.js"></script> -->
     <!-- <script src="./promise.js"></script> -->
   </head>
-  <body oncontextmenu="event.preventDefault()"></body>
+  <body oncontextmenu="event.preventDefault()">
+    <script type="module">
+      import { enableGesture } from "./gesture";
+      enableGesture(document.documentElement);
+      document.documentElement.addEventListener("tap", () => {
+        console.log("tap event trigger!");
+      });
+    </script>
+  </body>
 </html>
