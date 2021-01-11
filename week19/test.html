@@ -1,0 +1,26 @@
+<!--
+ * @description: description
+ * @author: liuyun03
+ * @Date: 2020-12-30 11:05:51
+ * @LastEditors: liuyun03
+ * @LastEditTime: 2020-12-30 11:05:59
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <section id="layout">
+      <style>
+        #layout{background: #4cae4c;}
+        #layout .left{float: left;width: 100px;height: 100px;background: pink;}
+        #layout .right{height: 110px;background: #2a6496;overflow:hidden;//BFC的区域不会与浮动元素的box重叠}
+      </style>
+      <div class="left"></div>
+      <div class="right"></div>
+    </section>
+  </body>
+</html>
